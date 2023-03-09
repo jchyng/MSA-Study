@@ -1,0 +1,85 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      default-filters:                #filters등록 (모든 서비스에 적용됨 & 디폴트 필터가 기본적으로 실행 우선순위가 높다)
+        - name: GlobalFilter          #사용할 필터 클래스명
+          args:                       #config의 파라미터
+            baseMessage: Spring Cloud Gateway Global Filter
+            preLogger: true
+            postLogger: true
+      routes:
+#        - id: user-service
+#          uri: lb://USER-SERVICE
+#          predicates:
+#            - Path=/user-service/**
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: catalog-service
+          uri: lb://CATALOG-SERVICE
+          predicates:
+            - Path=/catalog-service/**
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/**
+
+
+        - id: MY-FIRST-SERVICE        #해당 라우터의 고유 식별자
+          uri: lb://MY-FIRST-SERVICE  #해당 라우터의 주소
+          predicates:                 #라우터의 조건 작성 /first-service/**로 시작하는 경우 해당 라우터로 요청 전송
+            - Path=/first-service/**
+          filters:                    #라우터에 사용되는 필터, 1개만 사용 시 바로 작성
+            - CustomFilter
+#            - AddRequestHeader=first-request, first-request-header2  (java filter를 사용하기 위해 사용)
+#            - AddRequestHeader=first-response, first-response-header2
+
+        - id: MY-SECOND-SERVICE
+          uri: lb://MY-SECOND-SERVICE
+          predicates:
+            - Path=/second-service/**
+          filters:
+            - name: CustomFilter       #두 개 이상 사용 시 name으로 작성
+            - name: LoggingFilter
+              args:
+                baseMessage: Hi, there
+                preLogger: true
+                postLogger: true
+
+
