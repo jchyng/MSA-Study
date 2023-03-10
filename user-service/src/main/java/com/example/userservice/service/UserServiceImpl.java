@@ -63,6 +63,7 @@ public class UserServiceImpl implements UserService {
         return repository.findAll();
     }
 
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = repository.findByEmail(username);
@@ -73,5 +74,15 @@ public class UserServiceImpl implements UserService {
         return new User(userEntity.getEmail(), userEntity.getEncryptedPwd(),
                 true, true, true,true,
                 new ArrayList<>());
+    }
+    @Override
+    public UserDto getUserDetailsByEmail(String email) {
+        UserEntity userEntity = repository.findByEmail(email);
+        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+
+        if(userEntity == null)
+            throw new UsernameNotFoundException(email);
+
+        return userDto;
     }
 }
