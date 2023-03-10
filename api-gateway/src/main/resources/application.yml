@@ -11,7 +11,11 @@ eureka:
 spring:
   application:
     name: api-gateway-service
+  config:
+    import: "optional:configserver:http://localhost:8888/"
   cloud:
+    config:
+      name: ecommerce
     gateway:
       default-filters:                #filters등록 (모든 서비스에 적용됨 & 디폴트 필터가 기본적으로 실행 우선순위가 높다)
         - name: GlobalFilter          #사용할 필터 클래스명
@@ -45,12 +49,22 @@ spring:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
             - Path=/user-service/**
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
             - AuthorizationHeaderFilter
+
 #            인증 없이 사용하고 싶다면 이런식으로 따로 추가
 #        - id: user-service
 #          uri: lb://USER-SERVICE
@@ -95,6 +109,12 @@ spring:
 
 token:
   secret: user_token
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httptrace
 
 logging:
   level:

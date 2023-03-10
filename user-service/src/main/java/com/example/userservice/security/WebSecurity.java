@@ -32,6 +32,7 @@ public class WebSecurity {
         http.csrf().disable();
 //        http.authorizeRequests().antMatchers("/users/**").permitAll();    //모든 요청에 대해 허가
         http.authorizeRequests().antMatchers("/error/**").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**")
                 .hasIpAddress("192.168.0.44")
                 .and()
