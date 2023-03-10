@@ -50,6 +50,16 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+#            인증 없이 사용하고 싶다면 이런식으로 따로 추가
+#        - id: user-service
+#          uri: lb://USER-SERVICE
+#          predicates:
+#            - Path=/user-service/welcome
+#            - Method=GET
+#          filters:
+#            - RemoveRequestHeader=Cookie
+#            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
         - id: catalog-service
           uri: lb://CATALOG-SERVICE
@@ -83,3 +93,9 @@ spring:
                 postLogger: true
 
 
+token:
+  secret: user_token
+
+logging:
+  level:
+    com.example.springcloud: DEBUG
