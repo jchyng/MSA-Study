@@ -9,3 +9,6 @@ spring:
       server:
         git:
           uri: https://github.com/jchyng/MSA-Study
+#private일 경우
+# username:
+# password:
