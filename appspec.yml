@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source:  /
-    destination: /home/ubuntu/MSA-study
+    destination: /home/ubuntu/MSA-Study
     overwrite: yes
 
 permissions:
